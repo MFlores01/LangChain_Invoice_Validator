@@ -1,2 +1,2 @@
-libsqlite3-dev
 sqlite3
+libsqlite3-dev
