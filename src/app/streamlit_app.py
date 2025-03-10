@@ -20,7 +20,12 @@ from styles.styles import CSS_STYLE  # Our advanced styling
 from core.chatbot import get_chatbot_response
 
 # Load environment variables
-load_dotenv()
+# Load API key from Streamlit Secrets (Cloud) or .env (Local)
+if "OPENAI_API_KEY" in st.secrets:
+    os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
+else:
+    load_dotenv()  # Load from .env locally
+    
 comparator = POComparator(temperature=0)
 
 class InvoiceValidationApp:
