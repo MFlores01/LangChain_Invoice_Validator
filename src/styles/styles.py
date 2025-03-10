@@ -1,5 +1,14 @@
 CSS_STYLE = """
 <style>
+  /* Hide GitHub icon */
+  [data-testid="stToolbarActionButtonIcon"] {
+    display: none !important;
+  }
+
+  /* Hide Fork label */
+  [data-testid="stToolbarActionButtonLabel"] {
+    display: none !important;
+  }
 body {
     background-color: #f8f8f8;
     margin: 0;
