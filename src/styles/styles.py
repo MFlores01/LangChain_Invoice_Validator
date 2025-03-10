@@ -1,23 +1,39 @@
 CSS_STYLE = """
 <style>
-  /* Hide GitHub icon */
-  [data-testid="stToolbarActionButtonIcon"] {
+  /* ======== Fork/GitHub Removal ======== */
+  /* Hide entire toolbar container */
+  [data-testid="stToolbar"],
+  .stAppToolbar.st-emotion-cache-15ecox0 {
     display: none !important;
+    pointer-events: none !important;
   }
 
-  /* Hide Fork label */
-  [data-testid="stToolbarActionButtonLabel"] {
-    display: none !important;
+  /* Nuclear option: Block upper-right corner clicks */
+  .stApp > header {
+    position: relative;
   }
-body {
+  .stApp > header::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 150px;
+    height: 60px;
+    background: transparent;
+    z-index: 999999;
+    pointer-events: all !important;
+  }
+
+  /* ======== Existing Styles ======== */
+  body {
     background-color: #f8f8f8;
     margin: 0;
     padding: 0;
     font-family: 'Open Sans', sans-serif;
-}
+  }
 
-/* Top bar with gradient and rounded corners */
-.top-bar {
+  /* Top bar with gradient and rounded corners */
+  .top-bar {
     background: linear-gradient(90deg, #005f73, #0a9396);
     display: flex;
     align-items: center;
@@ -26,37 +42,37 @@ body {
     margin: 20px auto;
     border-radius: 15px;
     box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-}
-.top-bar img {
+  }
+  .top-bar img {
     height: 50px;
     margin-right: 15px;
-}
-.top-bar h1 {
+  }
+  .top-bar h1 {
     color: #ffffff;
     font-size: 2rem;
     margin: 0;
     font-weight: bold;
-}
+  }
 
-/* Remove big white background behind file uploader */
-.upload-section {
+  /* Remove big white background behind file uploader */
+  .upload-section {
     background-color: transparent !important;
     margin: 0 auto !important;
     padding: 0 !important;
     width: 80% !important;
     box-shadow: none !important;
     border: none !important;
-}
+  }
 
-/* Elevated card with a blue header */
-.card-elevated {
+  /* Elevated card with a blue header */
+  .card-elevated {
     background-color: #ffffff;
     border-radius: 12px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     margin-bottom: 20px;
     overflow: hidden;
-}
-.card-header {
+  }
+  .card-header {
     background: #005f73;
     color: #ffffff;
     padding: 10px;
@@ -64,30 +80,30 @@ body {
     font-weight: bold;
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
-}
-.card-body {
+  }
+  .card-body {
     padding: 15px;
-}
+  }
 
-/* Table for extracted line items (no colored header) */
-.table-custom {
+  /* Table for extracted line items (no colored header) */
+  .table-custom {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.9rem;
     color: #333;
-}
-.table-custom th {
-    background-color: #ffffff; /* no color for header */
+  }
+  .table-custom th {
+    background-color: #ffffff;
     color: #333;
-}
-.table-custom th, .table-custom td {
+  }
+  .table-custom th, .table-custom td {
     padding: 10px;
     border: 1px solid #dddddd;
     text-align: left;
-}
+  }
 
-/* CSV Download link styling (white, bold) */
-.download-link {
+  /* CSV Download link styling */
+  .download-link {
     display: inline-block;
     background: #005f73;
     color: #ffffff;
@@ -96,33 +112,27 @@ body {
     border-radius: 6px;
     text-decoration: none !important;
     margin-top: 15px;
-}
-.download-link:hover {
+  }
+  .download-link:hover {
     background: #004054;
     text-decoration: none !important;
-}
-a.download-link,
-a.download-link:link,
-a.download-link:visited,
-a.download-link:hover,
-a.download-link:active {
-  color: #ffffff !important;
-  background: #005f73 !important;
-  font-weight: bold !important;
-  text-decoration: none !important;
-  display: inline-block !important;
-  padding: 8px 15px !important;
-  border-radius: 6px !important;
-  margin-top: 15px !important;
-}
-a.download-link:hover {
-  background: #004054 !important;
-}
-/* Hide the fork and GitHub icon */
-.css-1jc7ptx, .e1ewe7hr3, .viewerBadge_container__1QSob,
-.styles_viewerBadge__1yB5_, .viewerBadge_link__1S137,
-.viewerBadge_text__1JaDK {
-    display: none;
-}
+  }
+  a.download-link,
+  a.download-link:link,
+  a.download-link:visited,
+  a.download-link:hover,
+  a.download-link:active {
+    color: #ffffff !important;
+    background: #005f73 !important;
+    font-weight: bold !important;
+    text-decoration: none !important;
+    display: inline-block !important;
+    padding: 8px 15px !important;
+    border-radius: 6px !important;
+    margin-top: 15px !important;
+  }
+  a.download-link:hover {
+    background: #004054 !important;
+  }
 </style>
 """
