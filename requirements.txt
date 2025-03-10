@@ -1,0 +1,18 @@
+
+#### **requirements.txt**
+```txt
+streamlit
+langchain_openai
+langchain
+chromadb
+pandas
+pytesseract
+Pillow
+python-dotenv
+PyMuPDF
+langchain_community
+langchain-chromadb
+pytest
+setuptools
+streamlit_option_menu
+streamlit_extras
