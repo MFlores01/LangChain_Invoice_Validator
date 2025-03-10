@@ -4,8 +4,8 @@
 streamlit
 langchain_openai
 langchain
+base64
 chromadb
-pandas
 pytesseract
 Pillow
 python-dotenv
@@ -16,3 +16,5 @@ pytest
 setuptools
 streamlit_option_menu
 streamlit_extras
+PyMuPDF
+pandas
