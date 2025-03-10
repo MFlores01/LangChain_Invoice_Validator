@@ -1,6 +1,10 @@
 # src/utils/db.py
 import sqlite3
 import json
+import sys 
+import pysqlite3
+
+sys.modules["sqlite3"] = pysqlite3
 
 class DatabaseManager:
     DB_PATH = "invoices.db"
