@@ -1,12 +1,15 @@
 import sys
 import os
+
+# Ensure `src/` is in the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import base64
 import streamlit as st
 import json
 import pandas as pd
 from dotenv import load_dotenv
 from streamlit_option_menu import option_menu
-
 from core.validation_engine import InvoiceValidationService
 from core.po_validation_engine import POValidationService
 from core.po_comparator import POComparator
