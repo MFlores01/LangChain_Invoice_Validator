@@ -1,10 +1,9 @@
 # src/utils/db.py
 import sqlite3
 import json
-import sys 
-import pysqlite3
-
-sys.modules["sqlite3"] = pysqlite3
+import sys
+import sqlite3
+sys.modules["sqlite3"] = sqlite3
 
 class DatabaseManager:
     DB_PATH = "invoices.db"
@@ -18,7 +17,6 @@ class DatabaseManager:
         # Enable foreign keys support
         cursor.execute("PRAGMA foreign_keys = ON;")
         # Create the purchase_orders table.
-        # Here, po_number is UNIQUE to uniquely identify each PO.
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS purchase_orders (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,7 +28,6 @@ class DatabaseManager:
             )
         """)
         # Create the invoices table.
-        # The po_number here is a foreign key referencing purchase_orders(po_number).
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS invoices (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -61,7 +58,6 @@ class DatabaseManager:
         invoice_number = extracted_fields.get("invoice_number", "")
         invoice_date = extracted_fields.get("invoice_date", "")
         supplier_name = extracted_fields.get("supplier_name", "")
-        # Optionally include the PO number if it exists.
         po_number = extracted_fields.get("po_number", "")
         json_fields = json.dumps(extracted_fields)
         try:
@@ -71,7 +67,6 @@ class DatabaseManager:
             )
             conn.commit()
         except sqlite3.IntegrityError:
-            # Duplicate found; do nothing.
             pass
         conn.close()
 
@@ -98,9 +93,33 @@ class DatabaseManager:
             )
             conn.commit()
         except sqlite3.IntegrityError:
-            # Duplicate found; do nothing.
             pass
         conn.close()
+
+    def get_invoice_by_po(self, po_number: str):
+        conn = sqlite3.connect(DatabaseManager.DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM invoices WHERE po_number = ?", (po_number,))
+        result = cursor.fetchone()  # Use fetchone() instead of fetchall()
+        conn.close()
+
+        if result:
+            columns = [column[0] for column in cursor.description]
+            return dict(zip(columns, result))  # Return the result as a dictionary
+        return {}
+
+    def get_purchase_order_by_number(self, po_number: str):
+        conn = sqlite3.connect(DatabaseManager.DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM purchase_orders WHERE po_number = ?", (po_number,))
+        result = cursor.fetchone()  # Use fetchone() instead of fetchall()
+        conn.close()
+
+        if result:
+            columns = [column[0] for column in cursor.description]
+            return dict(zip(columns, result))  # Return the result as a dictionary
+        return {}
+
 
     # Methods to clear the tables (for testing purposes)
     def clear_invoices(self):
