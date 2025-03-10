@@ -7,10 +7,9 @@ Pillow
 python-dotenv
 PyMuPDF
 langchain_community
-langchain-chromadb
 pytest
 setuptools
 streamlit_option_menu
 streamlit_extras
-PyMuPDF
+pymupdf
 pandas
