@@ -1,7 +1,6 @@
 streamlit
 langchain_openai
 langchain
-base64
 chromadb
 pytesseract
 Pillow
