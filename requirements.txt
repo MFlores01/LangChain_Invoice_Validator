@@ -13,4 +13,7 @@ setuptools
 streamlit_option_menu
 streamlit_extras
 pymupdf
+faiss-cpu
 pandas
+fastapi
+uvicorn

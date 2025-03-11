@@ -1,7 +1,8 @@
 # utils/vector_stores.py
 
 from langchain_openai import OpenAIEmbeddings
-from langchain.vectorstores import Chroma
+#from langchain.vectorstores import Chroma
+from langchain_community.vectorstores import Chroma
 
 # Initialize the embeddings only once.
 embeddings = OpenAIEmbeddings()

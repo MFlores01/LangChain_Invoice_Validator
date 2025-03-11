@@ -2,9 +2,10 @@
 
 import sqlite3
 import json
+__import__('pysqlite3')
 import sys
-sys.modules["sqlite3"] = sqlite3
-
+#sys.modules["sqlite3"] = sqlite3
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 class DatabaseManager:
     DB_PATH = "invoices.db"
 
