@@ -70,7 +70,7 @@ class InvoiceValidationApp:
         with st.sidebar:
             selected_page = option_menu(
                 "CloudStaff Invoice Validator",
-                ["Document Upload", "Chatbot Assistance"],
+                ["Document Upload", "Invoice"],
                 icons=["cloud-upload", "robot"],
                 menu_icon="briefcase",
                 default_index=0,
@@ -180,7 +180,7 @@ class InvoiceValidationApp:
                     st.markdown(self.build_discrepancy_card(discrepancy_report), unsafe_allow_html=True)
 
     def render_chatbot_page(self):
-        st.markdown("<h2>Chatbot Assistance</h2>", unsafe_allow_html=True)
+        st.markdown("<h2>Invoice Chatbot</h2>", unsafe_allow_html=True)
 
         for msg in st.session_state["messages"]:
             with st.chat_message(msg["role"]):
