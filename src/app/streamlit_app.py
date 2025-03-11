@@ -70,7 +70,7 @@ class InvoiceValidationApp:
         with st.sidebar:
             selected_page = option_menu(
                 "CloudStaff Invoice Validator",
-                ["Document Upload", "Invoice"],
+                ["Document Upload", "Invoice Chatbot"],
                 icons=["cloud-upload", "robot"],
                 menu_icon="briefcase",
                 default_index=0,
