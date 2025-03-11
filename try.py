@@ -4,7 +4,7 @@ import json
 from abc import ABC, abstractmethod
 from langchain.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-import fitz  # PyMuPDF for PDF extraction
+import pymupdf  # PyMuPDF for PDF extraction
 import pandas as pd
 import xml.etree.ElementTree as ET
 import tempfile
@@ -233,7 +233,7 @@ class PDFValidator(InvoiceValidator):
     def extract_text(self, file_path):
         """Extract text from PDF (PyMuPDF). If no text, fallback to OCR."""
         try:
-            doc = fitz.open(file_path)
+            doc = pymupdf.open(file_path)
             text = ""
             for page in doc:
                 page_text = page.get_text().strip()

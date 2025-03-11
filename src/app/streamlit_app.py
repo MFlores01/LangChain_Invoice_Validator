@@ -25,7 +25,7 @@ if "OPENAI_API_KEY" in st.secrets:
     os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 else:
     load_dotenv()  # Load from .env locally
-    
+
 comparator = POComparator(temperature=0)
 
 class InvoiceValidationApp:
@@ -40,6 +40,8 @@ class InvoiceValidationApp:
             st.session_state["po_result"] = {}
         if "invoice_result" not in st.session_state:
             st.session_state["invoice_result"] = {}
+        if "messages" not in st.session_state:
+            st.session_state["messages"] = []
 
     def load_css(self):
         st.markdown(CSS_STYLE, unsafe_allow_html=True)
@@ -179,12 +181,28 @@ class InvoiceValidationApp:
 
     def render_chatbot_page(self):
         st.markdown("<h2>Chatbot Assistance</h2>", unsafe_allow_html=True)
-        query = st.text_input("Ask about Invoices or Purchase Orders. For example: 'What is the discrepancy for invoice #12345?'")
+
+        for msg in st.session_state["messages"]:
+            with st.chat_message(msg["role"]):
+                st.markdown(msg["content"])
+
+        query = st.chat_input("Ask about Invoices or Purchase Orders. For example: 'What is the discrepancy for invoice #12345?'")
+        
         if query:
+            with st.chat_message("user"):
+                st.markdown(query)
+            
+            st.session_state.messages.append({"role": "user", "content": query})
+
             with st.spinner("Thinking..."):
                 responses = get_chatbot_response(query)
-            st.markdown("## Chatbot Response")
-            st.write(responses.get("answer", "No answer."))
+                # Extract the assistant's response text
+                assistant_response = responses.get('answer', '')  # Default to empty string if key not found
+                with st.chat_message("assistant"):
+                    st.markdown(assistant_response)
+
+            st.session_state.messages.append({"role": "assistant", "content": assistant_response})
+
 
     def build_combined_validation_card(self, po_result: dict, invoice_result: dict) -> str:
         if not po_result and not invoice_result:

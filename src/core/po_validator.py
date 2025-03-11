@@ -1,7 +1,7 @@
 import re
 import json, hashlib
 from abc import ABC, abstractmethod
-import fitz
+import pymupdf, fitz
 import pytesseract
 from PIL import Image
 import pandas as pd
@@ -170,7 +170,7 @@ class POValidator(ABC):
 class PDFPOValidator(POValidator):
     def extract_text(self, file_path: str) -> str:
         try:
-            doc = fitz.open(file_path)
+            doc = pymupdf.open(file_path)
             text = ""
             for page in doc:
                 page_text = page.get_text().strip()

@@ -1,4 +1,4 @@
-import fitz
+import pymupdf, fitz
 import pytesseract
 from PIL import Image
 import pandas as pd
@@ -73,7 +73,7 @@ class PDFValidator(InvoiceValidator):
     def extract_text(self, file_path):
         """Extract text from PDF using PyMuPDF; fallback to OCR if needed."""
         try:
-            doc = fitz.open(file_path)
+            doc = pymupdf.open(file_path)
             text = ""
             for page in doc:
                 page_text = page.get_text().strip()
