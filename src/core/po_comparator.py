@@ -4,7 +4,7 @@ from langchain_openai import ChatOpenAI
 
 class POComparator:
     def __init__(self, temperature: float = 0):
-        self.llm = ChatOpenAI(temperature=temperature)
+        self.llm = ChatOpenAI(model_name="gpt-4o", temperature=temperature)
     
     @staticmethod
     def parse_amount(amount_str: str) -> float:
@@ -98,10 +98,9 @@ class POComparator:
             "Your final report must include:\n\n"
             "1. <h2>Validation Status</h2>: A concise statement indicating documents are flagged for review.\n"
             "2. <h2>Invoice Details</h2>: A bullet list (<ul>) summarizing key invoice details (Invoice ID, Supplier, PO Number, etc.).\n"
-            "3. <h2>Discrepancy Analysis</h2>: A bullet list of identified discrepancies.\n"
-            "4. <h2>Severity</h2>: A derived severity rating (High, Moderate, Low): with an explanation.\n"
-            "5. <h2>Next Steps</h2>: Actionable recommendations.\n"
-            "6. <h2>Detailed Breakdown</h2>: For each line item, create an HTML table (<table>) with columns for Description, Invoice value, PO value, and match status (match or mistmatch).\n\n"
+            "3. <h2>Discrepancy Found</h2>: A bullet list of identified discrepancies.\n"
+            "4. <h2>Next Steps</h2>: Actionable recommendations.\n"
+            "5. <h2>Detailed Breakdown</h2>: For each line item, create an HTML table (<table>) with columns for Description, Invoice value, PO value, and match status (match or mistmatch).\n\n"
             "Important: If one document has an address while the other does not, do not automatically treat it as a severe discrepancy unless it's truly required. "
             "Use your best judgment. The final HTML must not contain <div> or extraneous tags.\n\n"
             "Below is the raw discrepancy analysis:\n"
@@ -115,7 +114,8 @@ class POComparator:
     def compare(self, invoice_fields: dict, po_fields: dict) -> str:
         """
         Generate the final discrepancy report by building a raw analysis, constructing the prompt,
-        invoking the LLM, and returning the final HTML report.
+        invoking the LLM, and returning the final HTML
+          report.
         """
         raw_analysis = self.build_raw_analysis(invoice_fields, po_fields)
         prompt = self.build_prompt(raw_analysis)

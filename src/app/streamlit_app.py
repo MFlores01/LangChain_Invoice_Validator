@@ -1,15 +1,12 @@
 import sys
 import os
-
-# Ensure `src/` is in the Python path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 import base64
 import streamlit as st
 import json
 import pandas as pd
 from dotenv import load_dotenv
 from streamlit_option_menu import option_menu
+
 from core.validation_engine import InvoiceValidationService
 from core.po_validation_engine import POValidationService
 from core.po_comparator import POComparator
@@ -19,12 +16,11 @@ from styles.styles import CSS_STYLE  # Our advanced styling
 # Import chatbot functionality from chatbot.py
 from core.chatbot import get_chatbot_response
 
-# Load environment variables
-# Load API key from Streamlit Secrets (Cloud) or .env (Local)
+# Load environment variables: use Streamlit secrets (Cloud) if available; otherwise, load .env locally.
 if "OPENAI_API_KEY" in st.secrets:
     os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 else:
-    load_dotenv()  # Load from .env locally
+    load_dotenv()
 
 comparator = POComparator(temperature=0)
 
@@ -35,11 +31,15 @@ class InvoiceValidationApp:
         self.load_css()
         self.invoice_service = InvoiceValidationService()
         self.po_service = POValidationService()
-        # Initialize session state to preserve results across page switches
+        # Initialize session state to preserve file upload results and chat messages
         if "po_result" not in st.session_state:
             st.session_state["po_result"] = {}
         if "invoice_result" not in st.session_state:
             st.session_state["invoice_result"] = {}
+        if "po_record" not in st.session_state:
+            st.session_state["po_record"] = {}
+        if "invoice_record" not in st.session_state:
+            st.session_state["invoice_record"] = {}
         if "messages" not in st.session_state:
             st.session_state["messages"] = []
 
@@ -55,7 +55,6 @@ class InvoiceValidationApp:
         return base64.b64encode(data).decode()
 
     def run(self):
-        # Render top bar
         st.markdown(
             f"""
             <div class="top-bar">
@@ -65,8 +64,6 @@ class InvoiceValidationApp:
             """,
             unsafe_allow_html=True
         )
-        
-        # Sidebar menu using option_menu
         with st.sidebar:
             selected_page = option_menu(
                 "CloudStaff Invoice Validator",
@@ -80,14 +77,13 @@ class InvoiceValidationApp:
                     "nav-link-selected": {"background": "linear-gradient(90deg, #005f73, #0a9396)", "color": "white"},
                 }
             )
-
         if selected_page == "Document Upload":
             self.render_upload_page()
         else:
             self.render_chatbot_page()
 
     def render_upload_page(self):
-        # File Uploaders for PO and Invoice
+        # File uploaders for PO and Invoice files
         col1, col2 = st.columns(2)
         with col1:
             st.markdown('<div class="upload-section">', unsafe_allow_html=True)
@@ -109,7 +105,7 @@ class InvoiceValidationApp:
         # Process files only when both are uploaded
         if uploaded_po and uploaded_invoice:
             st.markdown("<hr>", unsafe_allow_html=True)
-            # Process PO
+            # Process Purchase Order file
             po_ext = uploaded_po.name.split(".")[-1].lower()
             tmp_po_path = save_temp_file(uploaded_po, suffix=f".{po_ext}")
             try:
@@ -118,7 +114,7 @@ class InvoiceValidationApp:
                 st.error(f"PO validation failed: {str(e)}")
                 po_result = {}
             remove_temp_file(tmp_po_path)
-            # Process Invoice
+            # Process Invoice file
             inv_ext = uploaded_invoice.name.split(".")[-1].lower()
             tmp_inv_path = save_temp_file(uploaded_invoice, suffix=f".{inv_ext}")
             try:
@@ -128,20 +124,19 @@ class InvoiceValidationApp:
                 invoice_result = {}
             remove_temp_file(tmp_inv_path)
 
-            # Store results in session state
+            # Store results in session state for later use by the chatbot
             st.session_state["po_result"] = po_result
             st.session_state["invoice_result"] = invoice_result
+            st.session_state["po_record"] = po_result.get("extracted_fields", {})
+            st.session_state["invoice_record"] = invoice_result.get("extracted_fields", {})
 
-        # Retrieve results from session state
+        # Display uploaded document details if available
         po_result = st.session_state["po_result"]
         invoice_result = st.session_state["invoice_result"]
 
         if po_result or invoice_result:
-            # Build and display a combined validation results card
             combined_results_html = self.build_combined_validation_card(po_result, invoice_result)
             st.markdown(combined_results_html, unsafe_allow_html=True)
-
-            # Display PO Details if available
             if po_result.get("extracted_fields"):
                 st.markdown("<hr>", unsafe_allow_html=True)
                 st.markdown("<h2>Purchase Order Details</h2>", unsafe_allow_html=True)
@@ -154,8 +149,6 @@ class InvoiceValidationApp:
                     st.markdown(po_details_html, unsafe_allow_html=True)
                 with col_po_right:
                     st.markdown(po_extracted_html, unsafe_allow_html=True)
-
-            # Display Invoice Details if available
             if invoice_result.get("extracted_fields"):
                 st.markdown("<hr>", unsafe_allow_html=True)
                 st.markdown("<h2>Invoice Details</h2>", unsafe_allow_html=True)
@@ -168,8 +161,6 @@ class InvoiceValidationApp:
                     st.markdown(inv_details_html, unsafe_allow_html=True)
                 with col_inv_right:
                     st.markdown(inv_extracted_html, unsafe_allow_html=True)
-
-            # Generate and display discrepancy report if both data exist
             if po_result and invoice_result:
                 discrepancy_report = comparator.compare(
                     invoice_result.get("extracted_fields", {}),
@@ -181,28 +172,73 @@ class InvoiceValidationApp:
 
     def render_chatbot_page(self):
         st.markdown("<h2>Invoice Chatbot</h2>", unsafe_allow_html=True)
-
+        # Render chat history
         for msg in st.session_state["messages"]:
             with st.chat_message(msg["role"]):
                 st.markdown(msg["content"])
-
-        query = st.chat_input("Ask about Invoices or Purchase Orders. For example: 'What is the discrepancy for invoice #12345?'")
-        
+        query = st.chat_input("Ask about Invoices or Purchase Orders. For example: 'What is the information for invoice #1001329?'")
         if query:
             with st.chat_message("user"):
                 st.markdown(query)
-            
             st.session_state.messages.append({"role": "user", "content": query})
-
-            with st.spinner("Thinking..."):
-                responses = get_chatbot_response(query)
-                # Extract the assistant's response text
-                assistant_response = responses.get('answer', '')  # Default to empty string if key not found
+            # If the user requests a draft email, use stored records from session state
+            if query.strip().lower().startswith("draft email"):
+                if "invoice" in query.lower():
+                    record = st.session_state.get("invoice_record", {})
+                    if record:
+                        email_response = self.draft_email_response(record, record_type="invoice")
+                    else:
+                        email_response = "No invoice record available to draft an email."
+                elif "po" in query.lower() or "purchase order" in query.lower():
+                    record = st.session_state.get("po_record", {})
+                    if record:
+                        email_response = self.draft_email_response(record, record_type="po")
+                    else:
+                        email_response = "No purchase order record available to draft an email."
+                else:
+                    email_response = "Please specify whether you want an invoice or purchase order email draft."
                 with st.chat_message("assistant"):
-                    st.markdown(assistant_response)
+                    st.markdown(email_response)
+                st.session_state.messages.append({"role": "assistant", "content": email_response})
+            else:
+                with st.spinner("Thinking..."):
+                    responses = get_chatbot_response(query)
+                    assistant_response = responses.get("answer", "")
+                    with st.chat_message("assistant"):
+                        st.markdown(assistant_response)
+                st.session_state.messages.append({"role": "assistant", "content": assistant_response})
 
-            st.session_state.messages.append({"role": "assistant", "content": assistant_response})
-
+    def draft_email_response(self, record: dict, record_type: str) -> str:
+        if record_type == "invoice":
+            email_body = (
+                f"Dear {record.get('invoice_to', 'Customer')},\n\n"
+                f"Regarding your invoice {record.get('invoice_number', 'N/A')} dated {record.get('invoice_date', 'N/A')},\n"
+                f"we have reviewed the details as follows:\n"
+                f"- Total Amount: {record.get('total_amount', 'N/A')}\n"
+                f"- Invoice To: {record.get('invoice_to', 'N/A')}\n"
+                f"- Email: {record.get('email', 'N/A')}\n"
+                f"- Phone: {record.get('phone_number', 'N/A')}\n\n"
+                "Please review these details and let us know if any corrections are required.\n\n"
+                "Best regards,\n"
+                "Finance Team"
+            )
+            return email_body
+        elif record_type == "po":
+            email_body = (
+                f"Dear {record.get('supplier_name', 'Vendor')},\n\n"
+                f"Regarding your purchase order {record.get('po_number', 'N/A')} dated {record.get('po_date', 'N/A')},\n"
+                f"we have reviewed the details as follows:\n"
+                f"- Total: {record.get('total', 'N/A')}\n"
+                f"- Supplier: {record.get('supplier_name', 'N/A')}\n"
+                f"- Billing Address: {record.get('billing_address', 'N/A')}\n"
+                f"- Shipping Address: {record.get('shipping_address', 'N/A')}\n\n"
+                "Please review these details and let us know if any corrections are required.\n\n"
+                "Best regards,\n"
+                "Finance Team"
+            )
+            return email_body
+        else:
+            return "Invalid record type specified."
 
     def build_combined_validation_card(self, po_result: dict, invoice_result: dict) -> str:
         if not po_result and not invoice_result:
@@ -213,7 +249,6 @@ class InvoiceValidationApp:
         inv_valid = "✅" if invoice_result.get("is_valid_format") else "❌"
         inv_dup = "Yes" if invoice_result.get("is_duplicate") else "No"
         inv_status = "OK" if not invoice_result.get("is_corrupted") else "Corrupted"
-
         return f"""
         <div class="card-elevated" style="width:80%; margin:20px auto;">
           <div class="card-header">Combined Validation Results</div>
