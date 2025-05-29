@@ -15,6 +15,29 @@ It supports **PDF, CSV, XML, PNG/JPG** invoices, uses **Tesseract OCR** for text
 
 ---
 
+## 🖼️ Screenshots
+
+### 📤 Document Upload Interface
+![Upload and Validation](https://github.com/MFlores01/LangChain_Invoice_Validator/blob/main/src/assets/Validation%20and%20File%20Upload.png)
+
+### 🤖 Chatbot Summary View
+![Chatbot View]()
+
+### ✉️ Auto Email Drafting & Query about details of Data
+![Chatbot Data Query](https://github.com/MFlores01/LangChain_Invoice_Validator/blob/main/src/assets/Chatbot.png)
+![Chatbot Email Draft](https://github.com/MFlores01/LangChain_Invoice_Validator/blob/main/src/assets/Chatbot%202.png)
+
+### ⚠️ Discrepancy Report
+![Discrepancy Report](https://github.com/MFlores01/LangChain_Invoice_Validator/blob/main/src/assets/Discrepancy%20report.png)
+
+### 🧾 Invoice Details Display
+![Invoice Details](https://github.com/MFlores01/LangChain_Invoice_Validator/blob/main/src/assets/Invoice%20details%20displau.png)
+
+### 🧾 Purchase Order Details Display
+![PO Details](https://github.com/MFlores01/LangChain_Invoice_Validator/blob/main/src/assets/PO%20details%20display.png)
+
+
+
 ## ⚙️ How It Works  
 
 ### 1️⃣ Invoice Format Check  
