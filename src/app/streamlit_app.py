@@ -1,4 +1,4 @@
-import sys
+import sys, re
 import os
 import base64
 import streamlit as st
@@ -168,7 +168,9 @@ class InvoiceValidationApp:
                 )
                 if discrepancy_report.strip():
                     st.markdown("<hr>", unsafe_allow_html=True)
-                    st.markdown(self.build_discrepancy_card(discrepancy_report), unsafe_allow_html=True)
+                    cleaned_discrepancy_report = re.sub(r"```html|```", "", discrepancy_report).strip()
+                    st.markdown(self.build_discrepancy_card(cleaned_discrepancy_report), unsafe_allow_html=True)
+
 
     def render_chatbot_page(self):
         st.markdown("<h2>Invoice Chatbot</h2>", unsafe_allow_html=True)
