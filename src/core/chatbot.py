@@ -108,10 +108,15 @@ def get_chatbot_response(query: str) -> dict:
     3) Returns a dict {"answer": <final unified text>} for display.
     """
     # --- Guardrail ---
-    if not any(term in query.lower() for term in ["invoice", "po", "purchase order"]):
-        return {"answer": "Please ask a question related to invoices or purchase orders."}
-    if query.strip().lower() in {"hi", "hello", "hey"}:
+    query = query.strip().lower()
+    # Updated greeting detection to handle punctuation & variations
+    if re.match(r"^(hi|hello|hey)[.!?\s]*$", query):
         return {"answer": "Hello! How can I help you with your invoices and purchase orders today?"}
+
+    # Enforce invoice/PO-related queries only if it's not a greeting
+    if not any(term in query for term in ["invoice", "po", "purchase order"]):
+        return {"answer": "Please ask a question related to invoices or purchase orders."}
+    
 
     # --- Step 1: Extract invoice and PO references ---
     invoice_number = None
